@@ -1,28 +1,30 @@
-alerts = []
-print("Alert list: ")
+import re
 
-while True: 
+print("Alert List:")
+
+lines = []
+while True:
     line = input()
-    if not line :
+    if not line.strip():
         break
-    if "with priority" in line:
-        parts = line.split("with priority")
-        desc = parts[0].split(".",1) [-1].strip().strip('"')
-        priority = int(parts[1].strip()) 
-        alerts.append((priority,desc))
+    lines.append(line)
 
-sorted_alerts = []
-for alert in alerts:
-    i = 0
-    while i < len(sorted_alerts) and alert[0] >= sorted_alerts[i][0]:
-        i += 1
-    sorted_alerts.insert(i,alert)
+# Join all lines into a single string for regex parsing
+alert_text = "\n".join(lines)
 
-print("\n Processing Alerts: ")
-i = 1
-for aler in sorted_alerts:
-    p,d = aler
-    print(f"{i}. {d} (Priority:{p})")
-    i +=1 
+# Pattern to extract alerts like: "description" with priority X
+pattern = r'"(.*?)"\s+with\s+priority\s+(\d+)'
+matches = re.findall(pattern, alert_text)
+
+# Build (priority, description) tuples
+alerts = [(int(priority), desc) for desc, priority in matches]
+
+# Sort alerts by priority
+sorted_alerts = sorted(alerts)
+
+# Output
+print("\nProcessing Alerts:")
+for i, (priority, desc) in enumerate(sorted_alerts, 1):
+    print(f"{i}. {desc} (Priority: {priority})")
     
 
